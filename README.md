@@ -1,0 +1,2 @@
+# Understand
+Reading == Understanding
