@@ -1,1 +1,3 @@
-READING == UNDERSTANDING
+# Understand
+Reading == Understanding
+
