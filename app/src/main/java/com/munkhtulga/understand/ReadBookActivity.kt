@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.TextView
 
+
 class ReadBookActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -12,7 +13,9 @@ class ReadBookActivity : AppCompatActivity() {
 
         val bookText = intent.getStringExtra(BOOK_TEXT)
         findViewById<TextView>(R.id.bookText).apply {
-            text = bookText
+            text = bookText +
+                    intent.getStringExtra("NO_FILE")
+
         }
     }
 }
