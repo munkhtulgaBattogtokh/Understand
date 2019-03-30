@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity() {
 
         val linearLayout = findViewById<LinearLayout>(R.id.booksLinearLayout)
         DownloadFileTask().execute(
-            "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
+            "https://www.antennahouse.com/XSLsample/pdf/sample-link_1.pdf"
         )
 
         for (i in 1..100) {

@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Understand</string>
+    <string name="read_book_main_view_description">PDF Book</string>
+    <string name="read_book_default_remark_text">Scroll to remarked section</string>
 </resources>
