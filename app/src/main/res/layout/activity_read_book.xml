@@ -15,15 +15,8 @@
             android:id="@+id/remarkTextView" app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintHorizontal_bias="0.0" android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp" android:layout_marginTop="16dp"/>
-    <ImageView
-            android:layout_width="0dp"
-            android:layout_height="0dp" tools:srcCompat="@tools:sample/backgrounds/scenic"
-            android:id="@+id/bookImageView" app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintHorizontal_bias="1.0"
-            android:layout_marginBottom="16dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginStart="16dp" android:layout_marginEnd="16dp" android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@+id/remarkTextView" app:layout_constraintVertical_bias="1.0"
-            android:contentDescription="@string/read_book_main_view_description"/>
+    <com.github.barteksc.pdfviewer.PDFView android:layout_width="match_parent"
+                                           android:layout_height="match_parent"
+                                           android:id="@+id/bookPdfView"
+    ></com.github.barteksc.pdfviewer.PDFView>
 </android.support.constraint.ConstraintLayout>
