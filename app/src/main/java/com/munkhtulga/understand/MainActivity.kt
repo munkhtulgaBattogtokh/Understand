@@ -20,7 +20,7 @@ import java.nio.channels.Channels
 
 
 const val BOOK_TEXT = "com.munkhtulga.understand.BOOK_TEXT"
-const val FILE_NAME = "dummy.pdf"
+const val FILE_NAME = "dummy.doc"
 
 class MainActivity : AppCompatActivity() {
 
@@ -46,7 +46,7 @@ class MainActivity : AppCompatActivity() {
 
         val linearLayout = findViewById<LinearLayout>(R.id.booksLinearLayout)
         DownloadFileTask().execute(
-            "https://www.antennahouse.com/XSLsample/pdf/sample-link_1.pdf"
+            "https://d9db56472fd41226d193-1e5e0d4b7948acaf6080b0dce0b35ed5.ssl.cf1.rackcdn.com/spectools/docs/wd-spectools-word-sample-04.doc"
         )
 
         for (i in 1..100) {

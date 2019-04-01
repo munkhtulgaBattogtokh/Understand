@@ -13,9 +13,12 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ImageView
 import android.widget.TextView
-import com.github.barteksc.pdfviewer.PDFView
+import org.apache.poi.hwpf.HWPFDocument
 import java.io.File
-
+import java.io.FileInputStream
+import java.io.RandomAccessFile
+import org.apache.poi.hwpf.extractor.WordExtractor
+import java.io.BufferedInputStream
 
 class ReadBookActivity : AppCompatActivity() {
 
@@ -29,17 +32,45 @@ class ReadBookActivity : AppCompatActivity() {
                     intent.getStringExtra("NO_FILE")
 
         }
-        renderPdfFileWithBartekscPdfViewer()
+
+        findViewById<TextView>(R.id.bookTextView).apply {
+            text = bookText()
+        }
     }
 
-    // cannot select text
-    private fun renderPdfFileWithBartekscPdfViewer() {
-        //val file = File(filesDir.absolutePath, "sample.pdf")
-        val pdfView = findViewById<PDFView>(R.id.bookPdfView)
-        pdfView.fromAsset("sample.pdf").load()
+    private fun bookText(): String {
+        val file = File(filesDir.absolutePath, "dummy.doc")
+        val fStream = FileInputStream(file.absolutePath)
+        val doc = HWPFDocument(fStream) // maybe redundant
+        val wordExtractor = WordExtractor(doc)
+
+        var content = ""
+        val paragraphs = wordExtractor.paragraphText
+        for (paragraph in paragraphs) {
+            content += paragraph.toString()
+        }
+        fStream.close()
+        Log.v("WORDFILE", content)
+        return content
     }
 
-    // cannot select text
+
+    // all features in, but basically just google docs; use WebView; don't want margins and the PDFness.
+//    private fun renderPdfWithGoogleDocs(pdfLink: String) {
+//        val webView = findViewById<WebView>(R.id.bookWebView)
+//        webView.settings.javaScriptEnabled = true
+//        webView.webViewClient = WebViewClient()
+//        webView.loadUrl("http://docs.google.com/gview?url=$pdfLink")
+//    }
+
+    // cannot select text; use PdfView
+//    private fun renderPdfFileWithBartekscPdfViewer() {
+//        //val file = File(filesDir.absolutePath, "sample.pdf")
+//        val pdfView = findViewById<PDFView>(R.id.bookPdfView)
+//        pdfView.fromAsset("sample.pdf").load()
+//    }
+
+    // cannot select text; use ImageView
 //    private fun renderPdfFileStandardLibrary() {
 //        val file = File(filesDir.absolutePath, "dummy.pdf")
 //        val fileDescriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
