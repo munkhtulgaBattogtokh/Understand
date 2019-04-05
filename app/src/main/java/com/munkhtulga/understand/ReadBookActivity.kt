@@ -19,12 +19,49 @@ import java.io.FileInputStream
 import java.io.RandomAccessFile
 import org.apache.poi.hwpf.extractor.WordExtractor
 import java.io.BufferedInputStream
+import org.apache.poi.hslf.usermodel.HSLFTextParagraph.setText
+import android.text.style.BackgroundColorSpan
+import android.text.SpannableString
+import android.view.*
+
 
 class ReadBookActivity : AppCompatActivity() {
+
+    private val actionModeCallBack = object :  ActionMode.Callback {
+        override fun onDestroyActionMode(mode: ActionMode?) {
+        }
+
+        override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+            return false
+        }
+
+        override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+            val inflater: MenuInflater = mode!!.menuInflater
+            inflater.inflate(R.menu.text_select_menu, menu)
+            return true
+        }
+
+        override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+            return when (item?.itemId) {
+                R.id.text_select_menuitem -> {
+                    Log.v("MENUITEM", "WOOOOOOOOOOORKS")
+                    mode?.finish()
+                    true
+                }
+                else -> false
+            }
+        }
+    }
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_read_book)
+
+
+
+
 
         val bookText = intent.getStringExtra(BOOK_TEXT)
         findViewById<TextView>(R.id.remarkTextView).apply {
@@ -34,9 +71,14 @@ class ReadBookActivity : AppCompatActivity() {
         }
 
         findViewById<TextView>(R.id.bookTextView).apply {
-            text = bookText()
+            text = remark(bookText())
+            setOnLongClickListener {
+                this@ReadBookActivity.startActionMode(actionModeCallBack)
+                true
+            }
         }
     }
+
 
     private fun bookText(): String {
         val file = File(filesDir.absolutePath, "dummy.doc")
@@ -54,7 +96,11 @@ class ReadBookActivity : AppCompatActivity() {
         return content
     }
 
-
+    private fun remark(initial: String): SpannableString {
+        val str = SpannableString(initial)
+        str.setSpan(BackgroundColorSpan(Color.YELLOW), 0, 11, 0)
+        return str
+    }
     // all features in, but basically just google docs; use WebView; don't want margins and the PDFness.
 //    private fun renderPdfWithGoogleDocs(pdfLink: String) {
 //        val webView = findViewById<WebView>(R.id.bookWebView)
