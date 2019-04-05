@@ -23,6 +23,7 @@ import org.apache.poi.hslf.usermodel.HSLFTextParagraph.setText
 import android.text.style.BackgroundColorSpan
 import android.text.SpannableString
 import android.view.*
+import org.w3c.dom.Text
 
 
 class ReadBookActivity : AppCompatActivity() {
@@ -44,7 +45,9 @@ class ReadBookActivity : AppCompatActivity() {
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
             return when (item?.itemId) {
                 R.id.text_select_menuitem -> {
-                    Log.v("MENUITEM", "WOOOOOOOOOOORKS")
+                    findViewById<TextView>(R.id.bookTextView).apply {
+                        text = remark(bookText())
+                    }
                     mode?.finish()
                     true
                 }
@@ -59,10 +62,6 @@ class ReadBookActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_read_book)
 
-
-
-
-
         val bookText = intent.getStringExtra(BOOK_TEXT)
         findViewById<TextView>(R.id.remarkTextView).apply {
             text = bookText +
@@ -71,11 +70,8 @@ class ReadBookActivity : AppCompatActivity() {
         }
 
         findViewById<TextView>(R.id.bookTextView).apply {
-            text = remark(bookText())
-            setOnLongClickListener {
-                this@ReadBookActivity.startActionMode(actionModeCallBack)
-                true
-            }
+            text = bookText()
+            customSelectionActionModeCallback = actionModeCallBack
         }
     }
 
