@@ -7,19 +7,21 @@
         android:layout_height="match_parent"
         tools:context=".ReadBookActivity">
 
-    <TextView
+    <EditText
             android:text="@string/read_book_default_remark_text"
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
+            android:scrollHorizontally="false"
             app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
-            android:id="@+id/remarkTextView" app:layout_constraintTop_toTopOf="parent"
+            android:id="@+id/remarkEditText" app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintHorizontal_bias="0.0" android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp" android:layout_marginTop="16dp"/>
+            android:layout_marginEnd="16dp" android:layout_marginTop="16dp"
+            android:hint="@string/text_select_remark" android:textSize="12sp" android:inputType="textMultiLine"/>
     <ScrollView
             android:layout_width="0dp"
             android:layout_height="0dp" app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@+id/remarkTextView" android:layout_marginStart="16dp"
+            app:layout_constraintTop_toBottomOf="@+id/remarkEditText" android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp" android:layout_marginBottom="16dp"
             app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintVertical_bias="0.0">
@@ -31,7 +33,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:id="@+id/bookTextView" android:layout_marginTop="16dp"
-                    app:layout_constraintTop_toBottomOf="@+id/remarkTextView"
+                    app:layout_constraintTop_toBottomOf="@+id/remarkEditText"
                     app:layout_constraintStart_toStartOf="parent"
                     android:layout_marginStart="16dp" app:layout_constraintEnd_toEndOf="parent"
                     android:layout_marginEnd="16dp" android:layout_marginBottom="16dp"

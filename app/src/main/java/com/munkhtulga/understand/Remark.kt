@@ -1,6 +1,6 @@
 package com.munkhtulga.understand
 
-data class Remark(
+data class Remark (
     val content: String,
     val locationStart: Int,
     val locationEnd: Int,
