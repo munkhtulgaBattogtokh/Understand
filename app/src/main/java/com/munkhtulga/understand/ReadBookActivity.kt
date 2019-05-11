@@ -1,5 +1,6 @@
 package com.munkhtulga.understand
 
+import android.content.Intent
 import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -16,6 +17,9 @@ import android.text.style.ClickableSpan
 import android.view.*
 import android.widget.EditText
 
+const val REMARK_START = "com.munkhtulga.understand.remark_start"
+const val REMARKS = "com.munkhtulga.understand.remarks"
+
 class ReadBookActivity : AppCompatActivity() {
 
     private var remarkEditText: TextView? = null
@@ -30,27 +34,24 @@ class ReadBookActivity : AppCompatActivity() {
     }
 
     private val actionModeCallBack = object :  ActionMode.Callback {
-        override fun onDestroyActionMode(mode: ActionMode?) {
-        }
-
-        override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-            return false
-        }
-
+        override fun onDestroyActionMode(mode: ActionMode?) {}
+        override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean { return false }
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
             val inflater: MenuInflater = mode!!.menuInflater
-            inflater.inflate(R.menu.text_select_menu, menu)
+            inflater.inflate(R.menu.text_remark_menu, menu)
             return true
         }
 
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
             return when (item?.itemId) {
-                R.id.text_select_menuitem -> {
+                R.id.text_remark_menuitem -> {
                     this@ReadBookActivity.bookTextView?.apply {
-
-                        text = remark(bookText!!)
+                        val remarkStart = remark(bookText!!)
                         movementMethod = LinkMovementMethod.getInstance()
                         highlightColor = Color.YELLOW
+
+                        val intentToEditRemark = Intent(this@ReadBookActivity, EditRemarkActivity::class.java)
+                        startActivity(intentToEditRemark)
                     }
                     mode?.finish()
                     true
@@ -60,13 +61,11 @@ class ReadBookActivity : AppCompatActivity() {
         }
     }
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_read_book)
 
-        remarkEditText = findViewById<EditText>(R.id.remarkEditText)
+        remarkEditText = findViewById<EditText>(R.id.remarkTextView)
         bookTextView = findViewById<TextView>(R.id.bookTextView)
         bookText = SpannableString(bookText())
 
@@ -100,17 +99,14 @@ class ReadBookActivity : AppCompatActivity() {
         return content
     }
 
-    private fun remark(srcString: SpannableString): SpannableString {
+    private fun remark(srcString: SpannableString): Int {
         val start = bookTextView?.selectionStart ?: 0
         val end = bookTextView?.selectionEnd ?: 0
-        remarks.put(
-            start,
-            "episodes of life"
-        )
-
         srcString.setSpan(BackgroundColorSpan(Color.YELLOW), start, end,0)
         srcString.setSpan(RemarkClickableSpan(start), start, end,0)
-        return srcString
+
+        bookTextView?.text = srcString
+        return start
     }
     
     // all features in, but basically just google docs; use WebView; don't want margins and the PDFness.
