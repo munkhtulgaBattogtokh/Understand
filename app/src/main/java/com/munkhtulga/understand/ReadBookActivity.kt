@@ -18,18 +18,16 @@ import android.view.*
 import android.widget.EditText
 
 const val REMARK_START = "com.munkhtulga.understand.remark_start"
-const val REMARKS = "com.munkhtulga.understand.remarks"
 
 class ReadBookActivity : AppCompatActivity() {
 
     private var remarkEditText: TextView? = null
     private var bookTextView: TextView? = null
     private var bookText: SpannableString? = null
-    private var remarks: HashMap<Int, String> = HashMap()
 
     inner class RemarkClickableSpan(val start: Int): ClickableSpan() {
         override fun onClick(widget: View) {
-            remarkEditText!!.text = remarks.get(start)
+            remarkEditText!!.text = (this@ReadBookActivity.application as UnderstandApplication).getRemark(start)
         }
     }
 
@@ -50,7 +48,9 @@ class ReadBookActivity : AppCompatActivity() {
                         movementMethod = LinkMovementMethod.getInstance()
                         highlightColor = Color.YELLOW
 
-                        val intentToEditRemark = Intent(this@ReadBookActivity, EditRemarkActivity::class.java)
+                        val intentToEditRemark = Intent(this@ReadBookActivity, EditRemarkActivity::class.java).apply {
+                            putExtra(REMARK_START, remarkStart)
+                        }
                         startActivity(intentToEditRemark)
                     }
                     mode?.finish()

@@ -1,6 +1,7 @@
 package com.munkhtulga.understand
 
 import android.annotation.TargetApi
+import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.graphics.pdf.PdfRenderer
@@ -21,6 +22,13 @@ import java.nio.channels.Channels
 
 const val BOOK_TEXT = "com.munkhtulga.understand.BOOK_TEXT"
 const val FILE_NAME = "dummy.doc"
+
+class UnderstandApplication : Application() {
+    private val remarks: HashMap<Int, String> = HashMap()
+
+    fun addRemark(key: Int, value: String) = remarks.put(key, value)
+    fun getRemark(key: Int) = remarks[key]
+}
 
 class MainActivity : AppCompatActivity() {
 
@@ -48,6 +56,7 @@ class MainActivity : AppCompatActivity() {
         DownloadFileTask().execute(
             "https://d9db56472fd41226d193-1e5e0d4b7948acaf6080b0dce0b35ed5.ssl.cf1.rackcdn.com/spectools/docs/wd-spectools-word-sample-04.doc"
         )
+        (this.application as UnderstandApplication).addRemark(0, "Mojo got Mojo")
 
         for (i in 1..100) {
             addButton(layout = linearLayout, id = i)
