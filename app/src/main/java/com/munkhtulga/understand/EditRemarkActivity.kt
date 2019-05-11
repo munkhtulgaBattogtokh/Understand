@@ -2,10 +2,6 @@ package com.munkhtulga.understand
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.text.Editable
-import android.util.Log
-import android.view.View
-import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 
 class EditRemarkActivity : AppCompatActivity() {
@@ -25,7 +21,7 @@ class EditRemarkActivity : AppCompatActivity() {
 
     private fun updateRemark() {
         (this@EditRemarkActivity.application as UnderstandApplication).addRemark(
-            intent.extras[REMARK_START] as Int,
+            intent.extras?.getInt(REMARK_START) ?: 0,
             remarkEditText.text.toString()
         )
     }

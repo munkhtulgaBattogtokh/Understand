@@ -1,20 +1,15 @@
 package com.munkhtulga.understand
 
-import android.annotation.TargetApi
 import android.app.Application
 import android.content.Context
 import android.content.Intent
-import android.graphics.pdf.PdfRenderer
 import android.os.AsyncTask
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Parcel
-import android.os.ParcelFileDescriptor
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.LinearLayout.LayoutParams
-import java.io.File
 import java.io.FileOutputStream
 import java.net.URL
 import java.nio.channels.Channels
@@ -32,10 +27,10 @@ class UnderstandApplication : Application() {
 
 class MainActivity : AppCompatActivity() {
 
-    inner class DownloadFileTask: AsyncTask<String, Void, Unit>() {
+    class DownloadFileTask(private val fileOutputStream: FileOutputStream): AsyncTask<String, Void, Unit>() {
         override fun doInBackground(vararg params: String?) {
             Log.v("START!", "Background task starts")
-            this@MainActivity.openFileOutput(FILE_NAME, Context.MODE_PRIVATE).use {
+            fileOutputStream.use {
                 val url = URL(params[0])
                 val readableByteChannel = Channels.newChannel(url.openStream())
                 it.channel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE)
@@ -53,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val linearLayout = findViewById<LinearLayout>(R.id.booksLinearLayout)
-        DownloadFileTask().execute(
+        DownloadFileTask(openFileOutput(FILE_NAME, Context.MODE_PRIVATE)).execute(
             "https://d9db56472fd41226d193-1e5e0d4b7948acaf6080b0dce0b35ed5.ssl.cf1.rackcdn.com/spectools/docs/wd-spectools-word-sample-04.doc"
         )
         (this.application as UnderstandApplication).addRemark(0, "Mojo got Mojo")

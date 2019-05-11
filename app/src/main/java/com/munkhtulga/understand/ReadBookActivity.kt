@@ -1,5 +1,6 @@
 package com.munkhtulga.understand
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
@@ -15,19 +16,18 @@ import android.text.SpannableString
 import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.view.*
-import android.widget.EditText
 
 const val REMARK_START = "com.munkhtulga.understand.remark_start"
 
 class ReadBookActivity : AppCompatActivity() {
 
-    private var remarkEditText: TextView? = null
-    private var bookTextView: TextView? = null
-    private var bookText: SpannableString? = null
+    private lateinit var remarkEditText: TextView
+    private lateinit var bookTextView: TextView
+    private lateinit var bookText: SpannableString
 
-    inner class RemarkClickableSpan(val start: Int): ClickableSpan() {
+    inner class RemarkClickableSpan(private val start: Int): ClickableSpan() {
         override fun onClick(widget: View) {
-            remarkEditText!!.text = (this@ReadBookActivity.application as UnderstandApplication).getRemark(start)
+            remarkEditText.text = (this@ReadBookActivity.application as UnderstandApplication).getRemark(start)
         }
     }
 
@@ -43,8 +43,8 @@ class ReadBookActivity : AppCompatActivity() {
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
             return when (item?.itemId) {
                 R.id.text_remark_menuitem -> {
-                    this@ReadBookActivity.bookTextView?.apply {
-                        val remarkStart = remark(bookText!!)
+                    this@ReadBookActivity.bookTextView.apply {
+                        val remarkStart = remark(bookText)
                         movementMethod = LinkMovementMethod.getInstance()
                         highlightColor = Color.YELLOW
 
@@ -61,22 +61,21 @@ class ReadBookActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_read_book)
 
-        remarkEditText = findViewById<EditText>(R.id.remarkTextView)
-        bookTextView = findViewById<TextView>(R.id.bookTextView)
+        remarkEditText = findViewById(R.id.remarkTextView)
+        bookTextView = findViewById(R.id.bookTextView)
         bookText = SpannableString(bookText())
 
-        remarkEditText?.apply {
+        remarkEditText.apply {
             val bookText = intent.getStringExtra(BOOK_TEXT)
-            text = bookText +
-                    intent.getStringExtra("NO_FILE")
-
+            text = "$bookText${intent.getStringExtra("NO_FILE")}"
         }
 
-        bookTextView?.apply {
+        bookTextView.apply {
             text = bookText()
             customSelectionActionModeCallback = actionModeCallBack
         }
@@ -100,12 +99,12 @@ class ReadBookActivity : AppCompatActivity() {
     }
 
     private fun remark(srcString: SpannableString): Int {
-        val start = bookTextView?.selectionStart ?: 0
-        val end = bookTextView?.selectionEnd ?: 0
+        val start = bookTextView.selectionStart
+        val end = bookTextView.selectionEnd
         srcString.setSpan(BackgroundColorSpan(Color.YELLOW), start, end,0)
         srcString.setSpan(RemarkClickableSpan(start), start, end,0)
 
-        bookTextView?.text = srcString
+        bookTextView.text = srcString
         return start
     }
     
