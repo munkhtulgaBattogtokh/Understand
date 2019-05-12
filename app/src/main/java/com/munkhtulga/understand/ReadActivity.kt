@@ -1,34 +1,51 @@
 package com.munkhtulga.understand
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Color
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.widget.TextView
-import org.apache.poi.hwpf.HWPFDocument
-import java.io.File
-import java.io.FileInputStream
-import org.apache.poi.hwpf.extractor.WordExtractor
-import android.text.style.BackgroundColorSpan
+import android.support.v7.app.AppCompatActivity
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod
+import android.text.style.BackgroundColorSpan
 import android.text.style.ClickableSpan
+import android.util.Log
 import android.view.*
+import android.widget.TextView
+import kotlinx.android.synthetic.main.activity_read.*
+import org.apache.poi.hwpf.HWPFDocument
+import org.apache.poi.hwpf.extractor.WordExtractor
+import java.io.File
+import java.io.FileInputStream
 
-const val REMARK_START = "com.munkhtulga.understand.remark_start"
+const val REMARK_START = "com.munkhtulga.understand.REMARK_START"
+const val REMARK_TEXT = "com.munkhtulga.understand.REMARK_TEXT"
 
-class ReadBookActivity : AppCompatActivity() {
-
-    private lateinit var remarkEditText: TextView
+class ReadActivity : AppCompatActivity() {
+    private lateinit var remarkTextView: TextView
     private lateinit var bookTextView: TextView
     private lateinit var bookText: SpannableString
 
-    inner class RemarkClickableSpan(private val start: Int): ClickableSpan() {
-        override fun onClick(widget: View) {
-            remarkEditText.text = (this@ReadBookActivity.application as UnderstandApplication).getRemark(start)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_read)
+        fab.setOnClickListener {
+            startEditActivity((this@ReadActivity.application as UnderstandApplication).lastRemarkLocation)
         }
+
+        remarkTextView = findViewById(R.id.remarkTextView)
+        bookTextView = findViewById(R.id.bookTextView)
+        bookText = SpannableString(resources.getString(R.string.large_text))
+
+        bookTextView.apply {
+            customSelectionActionModeCallback = actionModeCallBack
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        remarkTextView.text = (this@ReadActivity.application as UnderstandApplication).getRemark(
+            (this@ReadActivity.application as UnderstandApplication).lastRemarkLocation
+        )
     }
 
     private val actionModeCallBack = object :  ActionMode.Callback {
@@ -43,15 +60,11 @@ class ReadBookActivity : AppCompatActivity() {
         override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
             return when (item?.itemId) {
                 R.id.text_remark_menuitem -> {
-                    this@ReadBookActivity.bookTextView.apply {
+                    this@ReadActivity.bookTextView.apply {
                         val remarkStart = remark(bookText)
                         movementMethod = LinkMovementMethod.getInstance()
                         highlightColor = Color.YELLOW
-
-                        val intentToEditRemark = Intent(this@ReadBookActivity, EditRemarkActivity::class.java).apply {
-                            putExtra(REMARK_START, remarkStart)
-                        }
-                        startActivity(intentToEditRemark)
+                        startEditActivity(remarkStart)
                     }
                     mode?.finish()
                     true
@@ -61,41 +74,17 @@ class ReadBookActivity : AppCompatActivity() {
         }
     }
 
-    @SuppressLint("SetTextI18n")
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_read_book)
-
-        remarkEditText = findViewById(R.id.remarkTextView)
-        bookTextView = findViewById(R.id.bookTextView)
-        bookText = SpannableString(bookText())
-
-        remarkEditText.apply {
-            val bookText = intent.getStringExtra(BOOK_TEXT)
-            text = "$bookText${intent.getStringExtra("NO_FILE")}"
+    private val startEditActivity = { remarkStart: Int ->
+        val intentToEditRemark = Intent(this, EditRemarkActivity::class.java).apply {
+            putExtra(REMARK_START, remarkStart)
         }
-
-        bookTextView.apply {
-            text = bookText()
-            customSelectionActionModeCallback = actionModeCallBack
-        }
+        startActivity(intentToEditRemark)
     }
 
-
-    private fun bookText(): String {
-        val file = File(filesDir.absolutePath, "dummy.doc")
-        val fStream = FileInputStream(file.absolutePath)
-        val doc = HWPFDocument(fStream) // maybe redundant
-        val wordExtractor = WordExtractor(doc)
-
-        var content = ""
-        val paragraphs = wordExtractor.paragraphText
-        for (paragraph in paragraphs) {
-            content += paragraph.toString()
+    inner class RemarkClickableSpan(private val start: Int): ClickableSpan() {
+        override fun onClick(widget: View) {
+            remarkTextView.text = (this@ReadActivity.application as UnderstandApplication).getRemark(start)
         }
-        fStream.close()
-        Log.v("WORDFILE", content)
-        return content
     }
 
     private fun remark(srcString: SpannableString): Int {
@@ -107,8 +96,25 @@ class ReadBookActivity : AppCompatActivity() {
         bookTextView.text = srcString
         return start
     }
-    
-    // all features in, but basically just google docs; use WebView; don't want margins and the PDFness.
+
+//    private fun bookText(): String {
+//        val file = File(filesDir.absolutePath, "dummy.doc")
+//        val fStream = FileInputStream(file.absolutePath)
+//        val doc = HWPFDocument(fStream) // maybe redundant
+//        val wordExtractor = WordExtractor(doc)
+//
+//        var content = ""
+//        val paragraphs = wordExtractor.paragraphText
+//        for (paragraph in paragraphs) {
+//            content += paragraph.toString()
+//        }
+//        fStream.close()
+//        Log.v("WORDFILE", content)
+//        return content
+//    }
+}
+
+// all features in, but basically just google docs; use WebView; don't want margins and the PDFness.
 //    private fun renderPdfWithGoogleDocs(pdfLink: String) {
 //        val webView = findViewById<WebView>(R.id.bookWebView)
 //        webView.settings.javaScriptEnabled = true
@@ -116,14 +122,14 @@ class ReadBookActivity : AppCompatActivity() {
 //        webView.loadUrl("http://docs.google.com/gview?url=$pdfLink")
 //    }
 
-    // cannot select text; use PdfView
+// cannot select text; use PdfView
 //    private fun renderPdfFileWithBartekscPdfViewer() {
 //        //val file = File(filesDir.absolutePath, "sample.pdf")
 //        val pdfView = findViewById<PDFView>(R.id.bookPdfView)
 //        pdfView.fromAsset("sample.pdf").load()
 //    }
 
-    // cannot select text; use ImageView
+// cannot select text; use ImageView
 //    private fun renderPdfFileStandardLibrary() {
 //        val file = File(filesDir.absolutePath, "dummy.pdf")
 //        val fileDescriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY)
@@ -141,4 +147,3 @@ class ReadBookActivity : AppCompatActivity() {
 //
 //        bookImageView.setImageBitmap(bitmap)
 //    }
-}

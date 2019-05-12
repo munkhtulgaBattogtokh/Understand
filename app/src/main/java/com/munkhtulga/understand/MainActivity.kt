@@ -20,9 +20,14 @@ const val FILE_NAME = "dummy.doc"
 
 class UnderstandApplication : Application() {
     private val remarks: HashMap<Int, String> = HashMap()
+    var lastRemarkLocation: Int = 0
+        private set
 
     fun addRemark(key: Int, value: String) = remarks.put(key, value)
-    fun getRemark(key: Int) = remarks[key]
+    fun getRemark(key: Int): String? {
+        lastRemarkLocation = key
+        return remarks[key]
+    }
 }
 
 class MainActivity : AppCompatActivity() {
@@ -64,7 +69,7 @@ class MainActivity : AppCompatActivity() {
 
         newButton.text = text
         newButton.setOnClickListener {
-            val intentToRead = Intent(this, ReadBookActivity::class.java).apply {
+            val intentToRead = Intent(this, ReadActivity::class.java).apply {
                 putExtra(BOOK_TEXT, text)
             }
             startActivity(intentToRead)
