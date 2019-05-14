@@ -18,6 +18,7 @@ import java.io.File
 import java.io.FileInputStream
 
 const val REMARK_START = "com.munkhtulga.understand.REMARK_START"
+lateinit var selectedSpan: ReadActivity.RemarkClickableSpan
 
 class ReadActivity : AppCompatActivity() {
     private lateinit var remarkTextView: TextView
@@ -61,7 +62,7 @@ class ReadActivity : AppCompatActivity() {
                         val remarkStart = remark(bookTextView.text as SpannableString)
                         movementMethod = LinkMovementMethod.getInstance()
                         highlightColor = Color.YELLOW
-                        startEditActivity(remarkStart)
+//                        startEditActivity(remarkStart)
                     }
                     mode?.finish()
                     true
@@ -78,9 +79,22 @@ class ReadActivity : AppCompatActivity() {
         startActivity(intentToEditRemark)
     }
 
-    inner class RemarkClickableSpan(private val start: Int): ClickableSpan() {
+    inner class RemarkClickableSpan(val start: Int, val end: Int): ClickableSpan() {
+        private var selected: Boolean = false
+            set(isSelected) {
+                field = isSelected
+                (bookTextView.text as SpannableString).setSpan(
+                    BackgroundColorSpan(if (isSelected) Color.GREEN else Color.YELLOW), start, end, 0
+                )
+                if (isSelected) {
+                    if (::selectedSpan.isInitialized) { selectedSpan.selected = false }
+                    selectedSpan = this
+                }
+            }
+
         override fun onClick(widget: View) {
             remarkTextView.text = (this@ReadActivity.application as UnderstandApplication).getRemark(start)
+            selected = true
         }
     }
 
@@ -88,7 +102,7 @@ class ReadActivity : AppCompatActivity() {
         val start = bookTextView.selectionStart
         val end = bookTextView.selectionEnd
         srcString.setSpan(BackgroundColorSpan(Color.YELLOW), start, end,0)
-        srcString.setSpan(RemarkClickableSpan(start), start, end,0)
+        srcString.setSpan(RemarkClickableSpan(start, end), start, end,0)
 
         bookTextView.text = srcString
         return start
