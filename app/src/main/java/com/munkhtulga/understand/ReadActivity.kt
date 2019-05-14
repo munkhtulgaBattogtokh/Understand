@@ -18,12 +18,10 @@ import java.io.File
 import java.io.FileInputStream
 
 const val REMARK_START = "com.munkhtulga.understand.REMARK_START"
-const val REMARK_TEXT = "com.munkhtulga.understand.REMARK_TEXT"
 
 class ReadActivity : AppCompatActivity() {
     private lateinit var remarkTextView: TextView
     private lateinit var bookTextView: TextView
-    private lateinit var bookText: SpannableString
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,8 +31,7 @@ class ReadActivity : AppCompatActivity() {
         }
 
         remarkTextView = findViewById(R.id.remarkTextView)
-        bookTextView = findViewById(R.id.bookTextView)
-        bookText = SpannableString(resources.getString(R.string.large_text))
+        bookTextView = findViewById<TextView>(R.id.bookTextView).apply { setText(text, TextView.BufferType.SPANNABLE) }
 
         bookTextView.apply {
             customSelectionActionModeCallback = actionModeCallBack
@@ -61,7 +58,7 @@ class ReadActivity : AppCompatActivity() {
             return when (item?.itemId) {
                 R.id.text_remark_menuitem -> {
                     this@ReadActivity.bookTextView.apply {
-                        val remarkStart = remark(bookText)
+                        val remarkStart = remark(bookTextView.text as SpannableString)
                         movementMethod = LinkMovementMethod.getInstance()
                         highlightColor = Color.YELLOW
                         startEditActivity(remarkStart)
