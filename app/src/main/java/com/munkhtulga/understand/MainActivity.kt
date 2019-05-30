@@ -19,15 +19,14 @@ const val BOOK_TEXT = "com.munkhtulga.understand.BOOK_TEXT"
 const val FILE_NAME = "dummy.doc"
 
 class UnderstandApplication : Application() {
-    private val remarks: HashMap<Int, String> = HashMap()
+    val books: HashMap<String, Book> = HashMap()
+    lateinit var currentBook: Book
     var lastRemarkLocation: Int = 0
+        get() = currentBook.lastRemarkLocation
         private set
 
-    fun addRemark(key: Int, value: String) = remarks.put(key, value)
-    fun getRemark(key: Int): String? {
-        lastRemarkLocation = key
-        return remarks[key]
-    }
+    fun addRemark(key: Int, value: String) = currentBook.addRemark(key, value)
+    fun getRemark(key: Int): String? = currentBook.getRemark(key)
 }
 
 class MainActivity : AppCompatActivity() {
@@ -56,7 +55,6 @@ class MainActivity : AppCompatActivity() {
         DownloadFileTask(openFileOutput(FILE_NAME, Context.MODE_PRIVATE)).execute(
             "https://d9db56472fd41226d193-1e5e0d4b7948acaf6080b0dce0b35ed5.ssl.cf1.rackcdn.com/spectools/docs/wd-spectools-word-sample-04.doc"
         )
-        (this.application as UnderstandApplication).addRemark(0, "Mojo got Mojo")
 
         for (i in 1..100) {
             addButton(layout = linearLayout, id = i)
@@ -67,8 +65,12 @@ class MainActivity : AppCompatActivity() {
         val newButton = Button(this)
         val text = "AMAZING x $id!"
 
+        val app = (this.application as UnderstandApplication)
+        app.books[text] = Book(text)
+
         newButton.text = text
         newButton.setOnClickListener {
+            app.currentBook = app.books[text]!!
             val intentToRead = Intent(this, ReadActivity::class.java).apply {
                 putExtra(BOOK_TEXT, text)
             }

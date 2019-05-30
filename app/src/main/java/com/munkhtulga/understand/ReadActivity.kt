@@ -37,6 +37,7 @@ class ReadActivity : AppCompatActivity() {
         bookTextView.apply {
             customSelectionActionModeCallback = actionModeCallBack
         }
+        restoreRemarks()
     }
 
     override fun onResume() {
@@ -44,6 +45,13 @@ class ReadActivity : AppCompatActivity() {
         remarkTextView.text = (this@ReadActivity.application as UnderstandApplication).getRemark(
             (this@ReadActivity.application as UnderstandApplication).lastRemarkLocation
         )
+    }
+
+    private fun restoreRemarks() {
+        val currentBook = (this.application as UnderstandApplication).currentBook
+        for ((start, _) in currentBook.remarks) {
+            remark(bookTextView.text as SpannableString, start, currentBook.remarkEnds[start]!!)
+        }
     }
 
     private val actionModeCallBack = object :  ActionMode.Callback {
@@ -59,10 +67,12 @@ class ReadActivity : AppCompatActivity() {
             return when (item?.itemId) {
                 R.id.text_remark_menuitem -> {
                     this@ReadActivity.bookTextView.apply {
-                        val remarkStart = remark(bookTextView.text as SpannableString)
-                        movementMethod = LinkMovementMethod.getInstance()
-                        highlightColor = Color.YELLOW
-//                        startEditActivity(remarkStart)
+                        val remarkStart = remark(
+                            bookTextView.text as SpannableString,
+                            start = bookTextView.selectionStart,
+                            end = bookTextView.selectionEnd
+                        )
+                        startEditActivity(remarkStart)
                     }
                     mode?.finish()
                     true
@@ -98,13 +108,16 @@ class ReadActivity : AppCompatActivity() {
         }
     }
 
-    private fun remark(srcString: SpannableString): Int {
-        val start = bookTextView.selectionStart
-        val end = bookTextView.selectionEnd
+    private fun remark(srcString: SpannableString, start: Int, end: Int): Int {
         srcString.setSpan(BackgroundColorSpan(Color.YELLOW), start, end,0)
         srcString.setSpan(RemarkClickableSpan(start, end), start, end,0)
 
-        bookTextView.text = srcString
+        (this@ReadActivity.application as UnderstandApplication).currentBook.remarkEnds[start] = end
+        bookTextView.apply {
+            text = srcString
+            movementMethod = LinkMovementMethod.getInstance()
+            highlightColor = Color.YELLOW
+        }
         return start
     }
 
