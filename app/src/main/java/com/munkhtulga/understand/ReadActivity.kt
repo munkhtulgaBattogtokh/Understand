@@ -35,7 +35,7 @@ class ReadActivity : AppCompatActivity() {
         bookTextView = findViewById<TextView>(R.id.bookTextView).apply { setText(text, TextView.BufferType.SPANNABLE) }
 
         bookTextView.apply {
-            customSelectionActionModeCallback = actionModeCallBack
+            customSelectionActionModeCallback = remarkActionModeCallBack
         }
         restoreRemarks()
     }
@@ -49,12 +49,12 @@ class ReadActivity : AppCompatActivity() {
 
     private fun restoreRemarks() {
         val currentBook = (this.application as UnderstandApplication).currentBook
-        for ((start, _) in currentBook.remarks) {
-            remark(bookTextView.text as SpannableString, start, currentBook.remarkEnds[start]!!)
-        }
+//        for ((start, _) in currentBook.remarks) {
+//            remark(bookTextView.text as SpannableString, start, currentBook.remarkEnds[start]!!)
+//        }
     }
 
-    private val actionModeCallBack = object :  ActionMode.Callback {
+    private val remarkActionModeCallBack = object :  ActionMode.Callback {
         override fun onDestroyActionMode(mode: ActionMode?) {}
         override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean { return false }
         override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
@@ -112,7 +112,7 @@ class ReadActivity : AppCompatActivity() {
         srcString.setSpan(BackgroundColorSpan(Color.YELLOW), start, end,0)
         srcString.setSpan(RemarkClickableSpan(start, end), start, end,0)
 
-        (this@ReadActivity.application as UnderstandApplication).currentBook.remarkEnds[start] = end
+//        (this@ReadActivity.application as UnderstandApplication).currentBook.remarkEnds[start] = end
         bookTextView.apply {
             text = srcString
             movementMethod = LinkMovementMethod.getInstance()
