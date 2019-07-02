@@ -1,6 +1,8 @@
 package com.munkhtulga.understand
 
 import android.app.Application
+import android.arch.persistence.room.Dao
+import android.arch.persistence.room.Room
 import android.content.Context
 import android.content.Intent
 import android.os.AsyncTask
@@ -20,53 +22,124 @@ const val FILE_NAME = "dummy.doc"
 
 class UnderstandApplication : Application() {
     val books: HashMap<String, Book> = HashMap()
+    lateinit var bookDao: BookDao
+    lateinit var remarkDao: RemarkDao
     lateinit var currentBook: Book
-    var lastRemarkLocation: Int = 0
-        get() = currentBook.lastRemarkLocation
+    var lastRemarkStartLocation: Int = 0
+        private set
+    var lastRemarkEndLocation: Int = 0
         private set
 
-    fun addRemark(key: Int, value: String) = currentBook.addRemark(key, value)
-    fun getRemark(key: Int): String? = currentBook.getRemark(key)
+    fun addRemark(start: Int, end: Int, content: String){
+        AddRemarkTask(start, end, content).execute() //= currentBook.addRemark
+    }
+
+    fun getRemark(start: Int): String = GetRemarkTask(start).execute().get() //= currentBook.getRemark(key)
+
+    inner class AddRemarkTask(val start: Int, val end: Int, val content: String): AsyncTask<String, Void, Unit>() {
+        override fun doInBackground(vararg params: String?) {
+            val existingRemark: Remark? = remarkDao.findByStartLocation(start)
+            if (existingRemark != null) remarkDao.delete(existingRemark)
+            remarkDao.insertAll(Remark(start = start, end = end, content = content, bookTitle = currentBook.title))
+        }
+    }
+
+    inner class GetRemarkTask(val start: Int): AsyncTask<String, Void, String>() {
+        override fun doInBackground(vararg params: String?): String {
+            val found: Remark? = remarkDao.findByStartLocation(start)
+            lastRemarkStartLocation = found?.start ?: 0
+            lastRemarkEndLocation = found?.end ?: 0
+            return found?.content ?: ""
+        }
+    }
 }
 
 class MainActivity : AppCompatActivity() {
 
-    class DownloadFileTask(private val fileOutputStream: FileOutputStream): AsyncTask<String, Void, Unit>() {
+    lateinit var app: UnderstandApplication
+
+//    class DownloadFileTask(private val fileOutputStream: FileOutputStream): AsyncTask<String, Void, Unit>() {
+//        override fun doInBackground(vararg params: String?) {
+//            Log.v("START!", "Background task starts")
+//            fileOutputStream.use {
+//                val url = URL(params[0])
+//                val readableByteChannel = Channels.newChannel(url.openStream())
+//                it.channel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE)
+//            }
+//        }
+//
+//        override fun onPostExecute(result: Unit?) {
+//            super.onPostExecute(result)
+//            Log.v("DONE!", "DOOOOOONE!")
+//        }
+//    }
+
+    inner class LoadBooksTask(): AsyncTask<String, Void, Unit>() {
         override fun doInBackground(vararg params: String?) {
-            Log.v("START!", "Background task starts")
-            fileOutputStream.use {
-                val url = URL(params[0])
-                val readableByteChannel = Channels.newChannel(url.openStream())
-                it.channel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE)
+            Log.v("START!", "FETCHING THE BOOKS FROM ROOM")
+
+            val db = Room.databaseBuilder(
+                applicationContext,
+                AppDatabase::class.java, "remarks"
+            ).build()
+
+            app.bookDao = db.bookDao()
+            app.remarkDao = db.remarkDao()
+
+            for (book in app.bookDao.getAll()) {
+                app.books[book.title] = book
             }
         }
 
         override fun onPostExecute(result: Unit?) {
             super.onPostExecute(result)
-            Log.v("DONE!", "DOOOOOONE!")
+            Log.v("DONE!", "DONE FETCHING BOOKS FROM ROOM!")
+
+            val linearLayout = findViewById<LinearLayout>(R.id.booksLinearLayout)
+            //        DownloadFileTask(openFileOutput(FILE_NAME, Context.MODE_PRIVATE)).execute(
+            //            "https://d9db56472fd41226d193-1e5e0d4b7948acaf6080b0dce0b35ed5.ssl.cf1.rackcdn.com/spectools/docs/wd-spectools-word-sample-04.doc"
+            //        )
+
+            for ((title, _) in app.books) {
+                Log.v("BOOKNAME:", title)
+                addButton(layout = linearLayout, text=title)
+            }
+
+        }
+    }
+
+    inner class StoreBooksTask(): AsyncTask<String, Void, Unit>() {
+        override fun doInBackground(vararg params: String?) {
+            Log.v("START!", "STORING THE BOOKS INTO ROOM")
+            val books: List<Book> = (0..100).map { Book("Awesome book #${it}") }
+            val existingBooks = app.bookDao.getAll()
+
+            for (bookToInsert in books) {
+                if (bookToInsert !in existingBooks) app.bookDao.insertAll(bookToInsert)
+            }
+        }
+
+        override fun onPostExecute(result: Unit?) {
+            super.onPostExecute(result)
+            Log.v("DONE!", "DONE STORING BOOKS INTO ROOM!")
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        app = application as UnderstandApplication
 
-        val linearLayout = findViewById<LinearLayout>(R.id.booksLinearLayout)
-        DownloadFileTask(openFileOutput(FILE_NAME, Context.MODE_PRIVATE)).execute(
-            "https://d9db56472fd41226d193-1e5e0d4b7948acaf6080b0dce0b35ed5.ssl.cf1.rackcdn.com/spectools/docs/wd-spectools-word-sample-04.doc"
-        )
-
-        for (i in 1..100) {
-            addButton(layout = linearLayout, id = i)
-        }
+        LoadBooksTask().execute()
     }
 
-    private fun addButton(layout: LinearLayout, id: Int) {
-        val newButton = Button(this)
-        val text = "AMAZING x $id!"
+    override fun onStop() {
+        super.onStop()
+        StoreBooksTask().execute()
+    }
 
-        val app = (this.application as UnderstandApplication)
-        app.books[text] = Book(text)
+    private fun addButton(layout: LinearLayout, text: String) {
+        val newButton = Button(this)
 
         newButton.text = text
         newButton.setOnClickListener {
