@@ -22,19 +22,41 @@ const val FILE_NAME = "dummy.doc"
 
 class UnderstandApplication : Application() {
     val books: HashMap<String, Book> = HashMap()
+    lateinit var bookDao: BookDao
+    lateinit var remarkDao: RemarkDao
     lateinit var currentBook: Book
-    var lastRemarkLocation: Int = 0
-//        get() = currentBook.lastRemarkLocation
+    var lastRemarkStartLocation: Int = 0
+        private set
+    var lastRemarkEndLocation: Int = 0
         private set
 
-    fun addRemark(key: Int, value: String) {}//= currentBook.addRemark(key, value)
-    fun getRemark(key: Int): String? = "DEFAULT REMARK" //= currentBook.getRemark(key)
+    fun addRemark(start: Int, end: Int, content: String){
+        AddRemarkTask(start, end, content).execute() //= currentBook.addRemark
+    }
+
+    fun getRemark(start: Int): String = GetRemarkTask(start).execute().get() //= currentBook.getRemark(key)
+
+    inner class AddRemarkTask(val start: Int, val end: Int, val content: String): AsyncTask<String, Void, Unit>() {
+        override fun doInBackground(vararg params: String?) {
+            val existingRemark: Remark? = remarkDao.findByStartLocation(start)
+            if (existingRemark != null) remarkDao.delete(existingRemark)
+            remarkDao.insertAll(Remark(start = start, end = end, content = content, bookTitle = currentBook.title))
+        }
+    }
+
+    inner class GetRemarkTask(val start: Int): AsyncTask<String, Void, String>() {
+        override fun doInBackground(vararg params: String?): String {
+            val found: Remark? = remarkDao.findByStartLocation(start)
+            lastRemarkStartLocation = found?.start ?: 0
+            lastRemarkEndLocation = found?.end ?: 0
+            return found?.content ?: ""
+        }
+    }
 }
 
 class MainActivity : AppCompatActivity() {
 
     lateinit var app: UnderstandApplication
-    lateinit var bookDao: BookDao
 
 //    class DownloadFileTask(private val fileOutputStream: FileOutputStream): AsyncTask<String, Void, Unit>() {
 //        override fun doInBackground(vararg params: String?) {
@@ -52,21 +74,20 @@ class MainActivity : AppCompatActivity() {
 //        }
 //    }
 
-    class LoadBooksTask(val activity: MainActivity): AsyncTask<String, Void, Unit>() {
+    inner class LoadBooksTask(): AsyncTask<String, Void, Unit>() {
         override fun doInBackground(vararg params: String?) {
             Log.v("START!", "FETCHING THE BOOKS FROM ROOM")
 
-            activity.apply {
-                val db = Room.databaseBuilder(
-                    applicationContext,
-                    AppDatabase::class.java, "remarks"
-                ).build()
+            val db = Room.databaseBuilder(
+                applicationContext,
+                AppDatabase::class.java, "remarks"
+            ).build()
 
-                bookDao = db.bookDao()
+            app.bookDao = db.bookDao()
+            app.remarkDao = db.remarkDao()
 
-                for (book in bookDao.getAll()) {
-                    app.books[book.title] = book
-                }
+            for (book in app.bookDao.getAll()) {
+                app.books[book.title] = book
             }
         }
 
@@ -74,30 +95,27 @@ class MainActivity : AppCompatActivity() {
             super.onPostExecute(result)
             Log.v("DONE!", "DONE FETCHING BOOKS FROM ROOM!")
 
-            activity.apply {
-                val linearLayout = findViewById<LinearLayout>(R.id.booksLinearLayout)
-                //        DownloadFileTask(openFileOutput(FILE_NAME, Context.MODE_PRIVATE)).execute(
-                //            "https://d9db56472fd41226d193-1e5e0d4b7948acaf6080b0dce0b35ed5.ssl.cf1.rackcdn.com/spectools/docs/wd-spectools-word-sample-04.doc"
-                //        )
+            val linearLayout = findViewById<LinearLayout>(R.id.booksLinearLayout)
+            //        DownloadFileTask(openFileOutput(FILE_NAME, Context.MODE_PRIVATE)).execute(
+            //            "https://d9db56472fd41226d193-1e5e0d4b7948acaf6080b0dce0b35ed5.ssl.cf1.rackcdn.com/spectools/docs/wd-spectools-word-sample-04.doc"
+            //        )
 
-                for ((title, _) in app.books) {
-                    Log.v("BOOKNAME:", title)
-                    addButton(layout = linearLayout, text=title)
-                }
+            for ((title, _) in app.books) {
+                Log.v("BOOKNAME:", title)
+                addButton(layout = linearLayout, text=title)
             }
+
         }
     }
 
-    class StoreBooksTask(val activity: MainActivity): AsyncTask<String, Void, Unit>() {
+    inner class StoreBooksTask(): AsyncTask<String, Void, Unit>() {
         override fun doInBackground(vararg params: String?) {
             Log.v("START!", "STORING THE BOOKS INTO ROOM")
-            activity.apply{
-                val books: List<Book> = (0..100).map { Book("Awesome book #${it}") }
-                val existingBooks = bookDao.getAll()
+            val books: List<Book> = (0..100).map { Book("Awesome book #${it}") }
+            val existingBooks = app.bookDao.getAll()
 
-                for (bookToInsert in books) {
-                    if (bookToInsert !in existingBooks) bookDao.insertAll(bookToInsert)
-                }
+            for (bookToInsert in books) {
+                if (bookToInsert !in existingBooks) app.bookDao.insertAll(bookToInsert)
             }
         }
 
@@ -112,12 +130,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         app = application as UnderstandApplication
 
-        LoadBooksTask(this).execute()
+        LoadBooksTask().execute()
     }
 
     override fun onStop() {
         super.onStop()
-        StoreBooksTask(this).execute()
+        StoreBooksTask().execute()
     }
 
     private fun addButton(layout: LinearLayout, text: String) {

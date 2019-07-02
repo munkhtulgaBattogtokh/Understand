@@ -6,14 +6,6 @@ import android.arch.persistence.room.*
 data class Book(
     @PrimaryKey val title: String
 )
-//    var lastRemarkLocation: Int = 0
-////        private set
-////
-////    fun addRemark(key: Int, value: String) = remarks.put(key, value)
-////    fun getRemark(key: Int): String? {
-////        lastRemarkLocation = key
-////        return remarks[key]
-////    }
 
 @Entity(
     foreignKeys = [ForeignKey(
@@ -47,11 +39,16 @@ interface RemarkDao {
     @Query("SELECT * FROM remark")
     fun getAll(): List<Remark>
 
+    @Query("SELECT * FROM remark WHERE bookTitle LIKE :title")
+    fun getAllByBookTitle(title: String): List<Remark>
+
     @Query("SELECT * FROM remark WHERE start IN (:remarkIds)")
     fun loadAllByIds(remarkIds: IntArray): List<Remark>
 
     @Query("SELECT * FROM remark WHERE start = :start LIMIT 1")
-    fun findByStartLocation(start: Int): Remark
+    fun findByStartLocation(start: Int): Remark?
+
+
 
     @Insert
     fun insertAll(vararg remarks: Remark)
