@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.os.AsyncTask
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.Toolbar
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod
 import android.text.style.BackgroundColorSpan
@@ -17,6 +18,9 @@ import org.apache.poi.hwpf.HWPFDocument
 import org.apache.poi.hwpf.extractor.WordExtractor
 import java.io.File
 import java.io.FileInputStream
+import android.widget.Toast
+
+
 
 const val REMARK_START = "com.munkhtulga.understand.REMARK_START"
 const val REMARK_END = "com.munkhtulga.understand.REMARK_END"
@@ -30,14 +34,9 @@ class ReadActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_read)
-        fab.setOnClickListener {
-            val app = (application as UnderstandApplication)
-            startEditActivity(
-                app.lastRemarkStartLocation,
-                app.lastRemarkEndLocation
-            )
-        }
 
+        val tb = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(tb)
         remarkTextView = findViewById(R.id.remarkTextView)
         bookTextView = findViewById<TextView>(R.id.bookTextView).apply { setText(text, TextView.BufferType.SPANNABLE) }
 
@@ -46,6 +45,32 @@ class ReadActivity : AppCompatActivity() {
         }
         RestoreRemarksTask().execute()
     }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        val id = item.itemId
+        val app = (application as UnderstandApplication)
+
+        if (id == R.id.action_edit) {
+            startEditActivity(app.lastRemarkStartLocation, app.lastRemarkEndLocation)
+            return true
+        } else if (id == R.id.action_see_all) {
+            Toast.makeText(this@ReadActivity, "Action see all", Toast.LENGTH_LONG).show()
+            return true
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
+
+
 
     override fun onResume() {
         super.onResume()
