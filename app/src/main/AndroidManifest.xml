@@ -13,6 +13,20 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
         <activity
+                android:name=".RemarkListActivity"
+                android:label="@string/title_remark_list"
+                android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
+                android:name=".RemarkDetailActivity"
+                android:label="@string/title_remark_detail"
+                android:parentActivityName=".RemarkListActivity"
+                android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value="com.munkhtulga.understand.RemarkListActivity"/>
+        </activity>
+        <activity
                 android:name=".ReadActivity"
                 android:label="@string/title_activity_read"
                 android:theme="@style/AppTheme.NoActionBar">

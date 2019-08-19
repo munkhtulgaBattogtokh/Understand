@@ -49,6 +49,7 @@ class ReadActivity : AppCompatActivity() {
             customSelectionActionModeCallback = remarkActionModeCallBack
         }
         RestoreRemarksTask().execute()
+        RestoreRemarksTask().execute()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -58,7 +59,8 @@ class ReadActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.list_remarks -> {
-            Snackbar.make(findViewById(R.id.coordinator), "All remarks", Snackbar.LENGTH_SHORT).show()
+            val intentToListRemarks = Intent(this, RemarkListActivity::class.java)
+            startActivity(intentToListRemarks)
             true
         }
         else -> {
