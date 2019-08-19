@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.AsyncTask
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod
@@ -53,6 +54,18 @@ class ReadActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.overflow_menu, menu)
         return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+        R.id.list_remarks -> {
+            Snackbar.make(findViewById(R.id.coordinator), "All remarks", Snackbar.LENGTH_SHORT).show()
+            true
+        }
+        else -> {
+            // If we got here, the user's action was not recognized.
+            // Invoke the superclass to handle it.
+            super.onOptionsItemSelected(item)
+        }
     }
 
     override fun onResume() {
