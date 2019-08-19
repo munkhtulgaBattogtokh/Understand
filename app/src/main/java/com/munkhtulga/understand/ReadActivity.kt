@@ -30,6 +30,9 @@ class ReadActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_read)
+        setSupportActionBar(findViewById(R.id.toolbar))
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+
         fab.setOnClickListener {
             val app = (application as UnderstandApplication)
             startEditActivity(
@@ -45,6 +48,11 @@ class ReadActivity : AppCompatActivity() {
             customSelectionActionModeCallback = remarkActionModeCallBack
         }
         RestoreRemarksTask().execute()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.overflow_menu, menu)
+        return true
     }
 
     override fun onResume() {
