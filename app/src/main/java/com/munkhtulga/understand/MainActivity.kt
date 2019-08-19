@@ -26,8 +26,10 @@ class UnderstandApplication : Application() {
     lateinit var remarkDao: RemarkDao
     lateinit var currentBook: Book
     var lastRemarkStartLocation: Int = 0
+        get() = currentBook.lastRemarkStartLocation
         private set
     var lastRemarkEndLocation: Int = 0
+        get() = currentBook.lastRemarkEndLocation
         private set
 
     fun addRemark(start: Int, end: Int, content: String){
@@ -47,8 +49,10 @@ class UnderstandApplication : Application() {
     inner class GetRemarkTask(val start: Int): AsyncTask<String, Void, String>() {
         override fun doInBackground(vararg params: String?): String {
             val found: Remark? = remarkDao.findByStartLocation(start)
-            lastRemarkStartLocation = found?.start ?: 0
-            lastRemarkEndLocation = found?.end ?: 0
+            currentBook.apply {
+                lastRemarkStartLocation = found?.start ?: 0
+                lastRemarkEndLocation = found?.end ?: 0
+            }
             return found?.content ?: ""
         }
     }
