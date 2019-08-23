@@ -1,11 +1,11 @@
 package com.munkhtulga.understand
 
+import android.os.AsyncTask
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.munkhtulga.understand.dummy.DummyContent
 import kotlinx.android.synthetic.main.activity_remark_detail.*
 import kotlinx.android.synthetic.main.remark_detail.view.*
 
@@ -17,10 +17,9 @@ import kotlinx.android.synthetic.main.remark_detail.view.*
  */
 class RemarkDetailFragment : Fragment() {
 
-    /**
-     * The dummy content this fragment is presenting.
-     */
-    private var item: DummyContent.DummyItem? = null
+    private var item: Remark? = null
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,7 +29,13 @@ class RemarkDetailFragment : Fragment() {
                 // Load the dummy content specified by the fragment
                 // arguments. In a real-world scenario, use a Loader
                 // to load content from a content provider.
-                item = DummyContent.ITEM_MAP[it.getString(ARG_ITEM_ID)]
+                item = object : AsyncTask<String, Void, Remark>() {
+                    override fun doInBackground(vararg p0: String?): Remark =
+                        (activity?.application as UnderstandApplication).remarkDao.findByStartLocation(
+                            it.getInt(ARG_ITEM_ID)
+                        )!!
+                }.execute().get()
+
                 activity?.toolbar_layout?.title = item?.content
             }
         }
@@ -44,7 +49,7 @@ class RemarkDetailFragment : Fragment() {
 
         // Show the dummy content as text in a TextView.
         item?.let {
-            rootView.remark_detail.text = it.details
+            rootView.remark_detail.text = it.content
         }
 
         return rootView

@@ -97,7 +97,7 @@ class RemarkListActivity : AppCompatActivity() {
                         .commit()
                 } else {
                     val intent = Intent(v.context, RemarkDetailActivity::class.java).apply {
-                        putExtra(RemarkDetailFragment.ARG_ITEM_ID, item.start.toString())
+                        putExtra(RemarkDetailFragment.ARG_ITEM_ID, item.start)
                     }
                     v.context.startActivity(intent)
                 }

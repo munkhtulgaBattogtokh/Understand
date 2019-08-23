@@ -42,9 +42,9 @@ class RemarkDetailActivity : AppCompatActivity() {
             // using a fragment transaction.
             val fragment = RemarkDetailFragment().apply {
                 arguments = Bundle().apply {
-                    putString(
+                    putInt(
                         RemarkDetailFragment.ARG_ITEM_ID,
-                        intent.getStringExtra(RemarkDetailFragment.ARG_ITEM_ID)
+                        intent.getIntExtra(RemarkDetailFragment.ARG_ITEM_ID,0)
                     )
                 }
             }
