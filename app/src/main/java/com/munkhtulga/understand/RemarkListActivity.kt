@@ -13,7 +13,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 
-import com.munkhtulga.understand.dummy.DummyContent
 import kotlinx.android.synthetic.main.activity_remark_list.*
 import kotlinx.android.synthetic.main.remark_list_content.view.*
 import kotlinx.android.synthetic.main.remark_list.*
