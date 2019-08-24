@@ -5,7 +5,10 @@ import android.arch.persistence.room.*
 @Entity
 data class Book(
     @PrimaryKey val title: String
-)
+) {
+    @Ignore var lastRemarkStartLocation: Int = 0
+    @Ignore var lastRemarkEndLocation: Int = 0
+}
 
 @Entity(
     foreignKeys = [ForeignKey(
