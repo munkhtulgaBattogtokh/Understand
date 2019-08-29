@@ -1,7 +1,7 @@
 package com.munkhtulga.understand.ui.login
 
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.munkhtulga.understand.data.LoginDataSource
 import com.munkhtulga.understand.data.LoginRepository
 

@@ -1,13 +1,13 @@
 package com.munkhtulga.understand
 
 import android.app.Application
-import android.arch.persistence.room.Dao
-import android.arch.persistence.room.Room
+import androidx.room.Dao
+import androidx.room.Room
 import android.content.Context
 import android.content.Intent
 import android.os.AsyncTask
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.widget.Button
 import android.widget.LinearLayout

@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "935828277104",
+    "firebase_url": "https://understand-c3aea.firebaseio.com",
+    "project_id": "understand-c3aea",
+    "storage_bucket": "understand-c3aea.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:935828277104:android:6e979218a1423dcd",
+        "android_client_info": {
+          "package_name": "com.munkhtulga.understand"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "935828277104-bdq5enh8cgg98a1mi1kvnionvk3odtnm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZhflI5zeNDSayFivnq8vEY-EYDXDABQc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "935828277104-bdq5enh8cgg98a1mi1kvnionvk3odtnm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

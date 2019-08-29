@@ -1,6 +1,6 @@
 package com.munkhtulga.understand
 
-import android.arch.persistence.room.*
+import androidx.room.*
 
 @Entity
 data class Book(
