@@ -12,6 +12,8 @@ import android.util.Log
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.LinearLayout.LayoutParams
+import android.widget.Toast
+import com.google.firebase.firestore.FirebaseFirestore
 import java.io.FileOutputStream
 import java.net.URL
 import java.nio.channels.Channels
@@ -42,8 +44,25 @@ class UnderstandApplication : Application() {
         override fun doInBackground(vararg params: String?) {
             val existingRemark: Remark? = remarkDao.findByStartLocation(start)
             if (existingRemark != null) remarkDao.delete(existingRemark)
-            remarkDao.insertAll(Remark(start = start, end = end, content = content, bookTitle = currentBook.title))
 
+            val remarkToAdd = Remark(start = start, end = end, content = content, bookTitle = currentBook.title)
+            remarkDao.insertAll(remarkToAdd)
+            FirebaseFirestore.getInstance().collection("remarks")
+                .add(remarkToAdd)
+                .addOnSuccessListener { documentReference ->
+                    Toast.makeText(
+                        applicationContext,
+                        "Success adding remark at $start",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                .addOnFailureListener { e ->
+                    Toast.makeText(
+                        applicationContext,
+                        "Failed to add remark at $start",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
         }
     }
 
