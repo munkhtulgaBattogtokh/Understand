@@ -49,14 +49,14 @@ class UnderstandApplication : Application() {
             remarkDao.insertAll(remarkToAdd)
             FirebaseFirestore.getInstance().collection("remarks")
                 .add(remarkToAdd)
-                .addOnSuccessListener { documentReference ->
+                .addOnSuccessListener {
                     Toast.makeText(
                         applicationContext,
                         "Success adding remark at $start",
                         Toast.LENGTH_LONG
                     ).show()
                 }
-                .addOnFailureListener { e ->
+                .addOnFailureListener {
                     Toast.makeText(
                         applicationContext,
                         "Failed to add remark at $start",

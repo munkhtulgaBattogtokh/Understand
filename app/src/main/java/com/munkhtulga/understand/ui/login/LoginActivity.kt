@@ -15,15 +15,24 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
+import com.facebook.AccessToken
+import com.facebook.CallbackManager
+import com.facebook.FacebookCallback
+import com.facebook.FacebookException
+import com.facebook.login.LoginManager
+import com.facebook.login.LoginResult
+import com.facebook.login.widget.LoginButton
 import com.google.firebase.FirebaseApp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.munkhtulga.understand.MainActivity
 
 import com.munkhtulga.understand.R
+import java.util.*
 
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var loginViewModel: LoginViewModel
+    private val callbackManager = CallbackManager.Factory.create()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,34 +111,80 @@ class LoginActivity : AppCompatActivity() {
         }
 
 
-        val remoteDB = FirebaseFirestore.getInstance()
+//        val remoteDB = FirebaseFirestore.getInstance()
+//
+//        // Create a new user with a first and last name
+//        val user = hashMapOf(
+//            "first" to "Munkhtulga",
+//            "last" to "Battogtokh",
+//            "born" to 1998
+//        )
+//
+//        // Add a new document with a generated ID
+//        remoteDB.collection("users")
+//            .add(user)
+//            .addOnSuccessListener { documentReference ->
+//                Toast.makeText(
+//                    applicationContext,
+//                    "Success adding user with id ${documentReference.id}",
+//                    Toast.LENGTH_LONG
+//                ).show()
+//            }
+//            .addOnFailureListener { e ->
+//                Toast.makeText(
+//                    applicationContext,
+//                    "Failed to add user",
+//                    Toast.LENGTH_LONG
+//                ).show()
+//            }
 
-        // Create a new user with a first and last name
-        val user = hashMapOf(
-            "first" to "Munkhtulga",
-            "last" to "Battogtokh",
-            "born" to 1998
-        )
 
-        // Add a new document with a generated ID
-        remoteDB.collection("users")
-            .add(user)
-            .addOnSuccessListener { documentReference ->
+        val email = "email"
+
+        val loginButton: LoginButton = findViewById(R.id.fb_login_button)
+        loginButton.setPermissions(email)
+
+        loginButton.registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
+            override fun onSuccess(loginResult: LoginResult) {
                 Toast.makeText(
                     applicationContext,
-                    "Success adding user with id ${documentReference.id}",
+                    "Login with FB success",
                     Toast.LENGTH_LONG
                 ).show()
             }
-            .addOnFailureListener { e ->
+
+            override fun onCancel() {
+                // App code
                 Toast.makeText(
                     applicationContext,
-                    "Failed to add user",
+                    "Canceled login with FB",
                     Toast.LENGTH_LONG
                 ).show()
             }
 
+            override fun onError(exception: FacebookException) {
+                // App code
+                Toast.makeText(
+                    applicationContext,
+                    "Error logging in with FB: ${exception.localizedMessage}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        })
 
+
+        val accessToken = AccessToken.getCurrentAccessToken()
+        val isLoggedIn = accessToken != null && !accessToken.isExpired
+
+
+//        // Then you can later perform the actual login, such as in a custom button's OnClickListener
+//        LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile"));
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        callbackManager.onActivityResult(requestCode, resultCode, data)
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun updateUiWithUser(model: LoggedInUserView) {
