@@ -43,6 +43,7 @@ class UnderstandApplication : Application() {
             val existingRemark: Remark? = remarkDao.findByStartLocation(start)
             if (existingRemark != null) remarkDao.delete(existingRemark)
             remarkDao.insertAll(Remark(start = start, end = end, content = content, bookTitle = currentBook.title))
+
         }
     }
 

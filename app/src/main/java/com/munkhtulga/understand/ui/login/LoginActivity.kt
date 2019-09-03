@@ -15,6 +15,8 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
+import com.google.firebase.FirebaseApp
+import com.google.firebase.firestore.FirebaseFirestore
 import com.munkhtulga.understand.MainActivity
 
 import com.munkhtulga.understand.R
@@ -25,8 +27,8 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_login)
+        FirebaseApp.initializeApp(this)
 
         val username = findViewById<EditText>(R.id.username)
         val password = findViewById<EditText>(R.id.password)
@@ -98,6 +100,36 @@ class LoginActivity : AppCompatActivity() {
                 loginViewModel.login(username.text.toString(), password.text.toString())
             }
         }
+
+
+        val remoteDB = FirebaseFirestore.getInstance()
+
+        // Create a new user with a first and last name
+        val user = hashMapOf(
+            "first" to "Munkhtulga",
+            "last" to "Battogtokh",
+            "born" to 1998
+        )
+
+        // Add a new document with a generated ID
+        remoteDB.collection("users")
+            .add(user)
+            .addOnSuccessListener { documentReference ->
+                Toast.makeText(
+                    applicationContext,
+                    "Success adding user with id ${documentReference.id}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(
+                    applicationContext,
+                    "Failed to add user",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+
+
     }
 
     private fun updateUiWithUser(model: LoggedInUserView) {
