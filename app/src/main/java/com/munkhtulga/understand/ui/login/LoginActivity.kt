@@ -15,10 +15,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
-import com.facebook.AccessToken
-import com.facebook.CallbackManager
-import com.facebook.FacebookCallback
-import com.facebook.FacebookException
+import com.facebook.*
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import com.facebook.login.widget.LoginButton
@@ -146,11 +143,19 @@ class LoginActivity : AppCompatActivity() {
 
         loginButton.registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
             override fun onSuccess(loginResult: LoginResult) {
+
+                val profile = Profile.getCurrentProfile()
+                val firstName = profile.firstName
+                val lastName = profile.lastName
+
                 Toast.makeText(
                     applicationContext,
-                    "Login with FB success",
+                    "Logged in with FB as $firstName $lastName",
                     Toast.LENGTH_LONG
                 ).show()
+
+                val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                startActivity(intent)
             }
 
             override fun onCancel() {
@@ -171,14 +176,6 @@ class LoginActivity : AppCompatActivity() {
                 ).show()
             }
         })
-
-
-        val accessToken = AccessToken.getCurrentAccessToken()
-        val isLoggedIn = accessToken != null && !accessToken.isExpired
-
-
-//        // Then you can later perform the actual login, such as in a custom button's OnClickListener
-//        LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile"));
 
     }
 
