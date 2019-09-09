@@ -17,6 +17,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import java.io.FileOutputStream
 import java.net.URL
 import java.nio.channels.Channels
+import androidx.sqlite.db.SupportSQLiteDatabase
+import androidx.room.migration.Migration
+import com.facebook.Profile
 
 
 const val BOOK_TEXT = "com.munkhtulga.understand.BOOK_TEXT"
@@ -45,7 +48,8 @@ class UnderstandApplication : Application() {
             val existingRemark: Remark? = remarkDao.findByStartLocation(start)
             if (existingRemark != null) remarkDao.delete(existingRemark)
 
-            val remarkToAdd = Remark(start = start, end = end, content = content, bookTitle = currentBook.title)
+            val remarkToAdd = Remark(start = start, end = end, content = content, bookTitle = currentBook.title,
+                userId= Profile.getCurrentProfile().id)
             remarkDao.insertAll(remarkToAdd)
             FirebaseFirestore.getInstance().collection("remarks")
                 .add(remarkToAdd)
@@ -101,6 +105,7 @@ class MainActivity : AppCompatActivity() {
     inner class LoadBooksTask(): AsyncTask<String, Void, Unit>() {
         override fun doInBackground(vararg params: String?) {
             Log.v("START!", "FETCHING THE BOOKS FROM ROOM")
+
 
             val db = Room.databaseBuilder(
                 applicationContext,

@@ -22,7 +22,8 @@ data class Remark(
     @PrimaryKey val start: Int,
     val end: Int,
     val content: String,
-    val bookTitle: String
+    val bookTitle: String,
+    val userId: String
 )
 
 @Dao
@@ -51,13 +52,14 @@ interface RemarkDao {
     @Query("SELECT * FROM remark WHERE start = :start LIMIT 1")
     fun findByStartLocation(start: Int): Remark?
 
-
-
     @Insert
     fun insertAll(vararg remarks: Remark)
 
     @Delete
     fun delete(remark: Remark)
+
+    @Query("DELETE FROM remark")
+    fun deleteAll()
 }
 
 
