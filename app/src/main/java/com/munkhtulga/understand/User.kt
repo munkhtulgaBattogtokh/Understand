@@ -28,7 +28,7 @@ interface UserDao {
     fun delete(user: User)
 }
 
-@Database(entities = arrayOf(User::class), version = 1)
+@Database(entities = arrayOf(User::class), version = 1, exportSchema = false)
 abstract class UserDataBase : RoomDatabase() {
     abstract fun userDao(): UserDao
 }

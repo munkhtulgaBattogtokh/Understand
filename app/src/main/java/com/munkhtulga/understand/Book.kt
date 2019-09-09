@@ -61,7 +61,7 @@ interface RemarkDao {
 }
 
 
-@Database(entities = arrayOf(Remark::class, Book::class), version = 1)
+@Database(entities = [Remark::class, Book::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun remarkDao(): RemarkDao
     abstract fun bookDao(): BookDao
